@@ -30,7 +30,9 @@ async function main() {
 
   const httpAdapter = app.getHttpAdapter();
   const instance = httpAdapter.getInstance();
-  instance.get('/', (_req: unknown, res: { redirect: (code: number, path: string) => void }) => res.redirect(302, '/docs'));
+  instance.get('/', (_req: unknown, res: { redirect: (code: number, path: string) => void }) =>
+    res.redirect(302, '/docs'),
+  );
 
   const port = parseInt(process.env.PORT || '3000', 10);
   await app.listen(port);

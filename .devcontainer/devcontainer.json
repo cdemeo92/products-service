@@ -1,0 +1,27 @@
+{
+  "name": "products-service",
+  "image": "node:24",
+  "runArgs": ["--platform=linux/arm64"],
+  "postCreateCommand": "npm i",
+  "forwardPorts": [3000],
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "files.watcherExclude": {
+          "**/.git/objects/**": true,
+          "**/.git/subtree-cache/**": true,
+          "**/node_modules/**": true,
+          "**/.nx/cache/**": true,
+          "**/dist/**": true,
+          "**/coverage/**": true
+        },
+        "search.exclude": {
+          "**/node_modules": true,
+          "**/.nx": true,
+          "**/dist": true,
+          "**/coverage": true
+        }
+      }
+    }
+  }
+}

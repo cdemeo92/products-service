@@ -1,0 +1,345 @@
+{
+  "info": {
+    "name": "Products Service",
+    "description": "Collection covering all requirements from the assignment: create, read (paginated), update, delete; validation; error handling; edge cases.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "productId", "value": "1", "description": "Set from Create product response (id); use for Update/Delete. For 404 use non-existent id (e.g. 99999)." }
+  ],
+  "item": [
+    {
+      "name": "Success",
+      "item": [
+        {
+          "name": "Create product",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productToken\": \"SKU-001\",\n  \"name\": \"Product One\",\n  \"price\": \"29.99\",\n  \"stock\": 100\n}"
+            },
+            "url": "{{baseUrl}}/products",
+            "description": "201 Created — new product. Copy returned `id` into collection variable `productId` for Update/Delete."
+          }
+        },
+        {
+          "name": "List products (default pagination)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/products",
+            "description": "200 OK — response: { products, page, size, total } with default page/size."
+          }
+        },
+        {
+          "name": "List products (page and size)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/products?page=1&size=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["products"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "size", "value": "10" }
+              ]
+            },
+            "description": "200 OK — paginated list."
+          }
+        },
+        {
+          "name": "List products (empty result)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/products?page=99&size=10",
+            "description": "200 OK — empty products array when page beyond data (or when DB has no products); total may be 0."
+          }
+        },
+        {
+          "name": "Update product (single field - stock)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"stock\": 50\n}" },
+            "url": "{{baseUrl}}/products/{{productId}}",
+            "description": "200 OK — update stock only (per assignment). Uses productId."
+          }
+        },
+        {
+          "name": "Update product (multiple fields)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Product One Updated\",\n  \"price\": \"24.99\",\n  \"stock\": 25\n}"
+            },
+            "url": "{{baseUrl}}/products/{{productId}}",
+            "description": "200 OK — partial update. Uses productId."
+          }
+        },
+        {
+          "name": "Delete product",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/products/{{productId}}",
+            "description": "204 No Content (or 200) — product removed. Uses productId."
+          }
+        }
+      ]
+    },
+    {
+      "name": "4xx - Client errors",
+      "item": [
+        {
+          "name": "409 - Duplicate productToken",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productToken\": \"SKU-001\",\n  \"name\": \"Another Product\",\n  \"price\": \"9.99\",\n  \"stock\": 10\n}"
+            },
+            "url": "{{baseUrl}}/products",
+            "description": "409 Conflict — productToken already exists (run after Create product with SKU-001)."
+          }
+        },
+        {
+          "name": "400 - Create missing productToken",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"No Token\",\n  \"price\": \"10.00\",\n  \"stock\": 5\n}"
+            },
+            "url": "{{baseUrl}}/products",
+            "description": "400 Bad Request — productToken required."
+          }
+        },
+        {
+          "name": "400 - Create missing name",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productToken\": \"SKU-002\",\n  \"price\": \"10.00\",\n  \"stock\": 5\n}"
+            },
+            "url": "{{baseUrl}}/products",
+            "description": "400 Bad Request — name required."
+          }
+        },
+        {
+          "name": "400 - Create missing price",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productToken\": \"SKU-003\",\n  \"name\": \"No Price\",\n  \"stock\": 5\n}"
+            },
+            "url": "{{baseUrl}}/products",
+            "description": "400 Bad Request — price required."
+          }
+        },
+        {
+          "name": "400 - Create missing stock",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productToken\": \"SKU-004\",\n  \"name\": \"No Stock\",\n  \"price\": \"10.00\"\n}"
+            },
+            "url": "{{baseUrl}}/products",
+            "description": "400 Bad Request — stock required."
+          }
+        },
+        {
+          "name": "400 - Create empty body",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{}" },
+            "url": "{{baseUrl}}/products",
+            "description": "400 Bad Request — required fields missing."
+          }
+        },
+        {
+          "name": "400 - Create empty productToken",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productToken\": \"\",\n  \"name\": \"Test\",\n  \"price\": \"1.00\",\n  \"stock\": 1\n}"
+            },
+            "url": "{{baseUrl}}/products",
+            "description": "400 Bad Request — productToken must not be empty."
+          }
+        },
+        {
+          "name": "400 - Create empty name",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productToken\": \"SKU-005\",\n  \"name\": \"\",\n  \"price\": \"1.00\",\n  \"stock\": 1\n}"
+            },
+            "url": "{{baseUrl}}/products",
+            "description": "400 Bad Request — name must not be empty."
+          }
+        },
+        {
+          "name": "400 - Create invalid price (negative)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productToken\": \"SKU-VALID\",\n  \"name\": \"Test\",\n  \"price\": \"-1.00\",\n  \"stock\": 1\n}"
+            },
+            "url": "{{baseUrl}}/products",
+            "description": "400 Bad Request — price must not be negative."
+          }
+        },
+        {
+          "name": "400 - Create invalid stock (negative)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productToken\": \"SKU-VALID2\",\n  \"name\": \"Test\",\n  \"price\": \"1.00\",\n  \"stock\": -1\n}"
+            },
+            "url": "{{baseUrl}}/products",
+            "description": "400 Bad Request — stock must not be negative."
+          }
+        },
+        {
+          "name": "400 - Create invalid price type (not a number)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productToken\": \"SKU-TYPE\",\n  \"name\": \"Test\",\n  \"price\": \"not-a-number\",\n  \"stock\": 1\n}"
+            },
+            "url": "{{baseUrl}}/products",
+            "description": "400 Bad Request — price must be a valid number (decimal)."
+          }
+        },
+        {
+          "name": "400 - Create invalid stock type (not an integer)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productToken\": \"SKU-TYPE2\",\n  \"name\": \"Test\",\n  \"price\": \"1.00\",\n  \"stock\": \"five\"\n}"
+            },
+            "url": "{{baseUrl}}/products",
+            "description": "400 Bad Request — stock must be an integer."
+          }
+        },
+        {
+          "name": "404 - Update non-existent product",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"stock\": 1\n}" },
+            "url": "{{baseUrl}}/products/99999",
+            "description": "404 Not Found — no product with id 99999."
+          }
+        },
+        {
+          "name": "404 - Delete non-existent product",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/products/99999",
+            "description": "404 Not Found — no product with id 99999."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Edge cases & validation",
+      "item": [
+        {
+          "name": "400 - List invalid page (zero or negative)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/products?page=0&size=10", "host": ["{{baseUrl}}"], "path": ["products"], "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "10" }] },
+            "description": "400 Bad Request — page should be >= 1 (if validated)."
+          }
+        },
+        {
+          "name": "400 - List invalid size (zero or negative)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/products?page=1&size=0", "host": ["{{baseUrl}}"], "path": ["products"], "query": [{ "key": "page", "value": "1" }, { "key": "size", "value": "0" }] },
+            "description": "400 Bad Request — size should be >= 1 (if validated)."
+          }
+        },
+        {
+          "name": "400 - List invalid query (non-numeric page/size)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/products?page=abc&size=xyz", "host": ["{{baseUrl}}"], "path": ["products"], "query": [{ "key": "page", "value": "abc" }, { "key": "size", "value": "xyz" }] },
+            "description": "400 Bad Request — page and size must be valid numbers (if validated)."
+          }
+        },
+        {
+          "name": "400 - Update invalid id in path",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"stock\": 1\n}" },
+            "url": "{{baseUrl}}/products/not-a-number",
+            "description": "400 Bad Request — id must be a valid number."
+          }
+        },
+        {
+          "name": "400 - Delete invalid id in path",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/products/not-a-number",
+            "description": "400 Bad Request — id must be a valid number."
+          }
+        },
+        {
+          "name": "400 - Update empty body",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{}" },
+            "url": "{{baseUrl}}/products/{{productId}}",
+            "description": "400 Bad Request — at least one field to update required (if validated); otherwise 200 no-op."
+          }
+        },
+        {
+          "name": "400 - Malformed JSON body (Create)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{ invalid json" },
+            "url": "{{baseUrl}}/products",
+            "description": "400 Bad Request — invalid JSON syntax."
+          }
+        },
+        {
+          "name": "404 - Delete already deleted (double delete)",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/products/{{productId}}",
+            "description": "404 Not Found — second delete of same product (run Delete product twice, or use id of already deleted product)."
+          }
+        }
+      ]
+    }
+  ]
+}

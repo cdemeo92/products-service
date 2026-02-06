@@ -2,6 +2,9 @@
   "name": "products-service",
   "image": "node:24",
   "runArgs": ["--platform=linux/arm64"],
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
   "postCreateCommand": "npm i",
   "forwardPorts": [3000],
   "customizations": {

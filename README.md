@@ -93,7 +93,7 @@ With the service running (e.g. on `http://localhost:3000`), you can try the foll
 
 ## Getting started
 
-### Local Developmenet
+### Local Development
 
 #### (Optional) Dev Container
 
@@ -129,17 +129,22 @@ npm i
 
 ##### 2. Start the DB
 
-(TBD)
+With Docker installed, start the MySQL container:
+
+```bash
+docker compose up -d db
+```
+
+Wait until MySQL is ready (e.g. 10–15 seconds). The Compose stack uses user `root`, password `password`, and database `ecommerce` by default. To use this DB from the app, set `MYSQL_USER=root` and `MYSQL_PASSWORD=password` in your environment or in a `.env` file (see [Environment variables](#environment-variables)).
 
 ##### 3. Build and run
 
 ```bash
-TBD: set env var
 npm run build
 npm start
 ```
 
-### 4. Run tests
+##### 4. Run tests
 
 ```bash
 npm run test
@@ -153,21 +158,35 @@ npm run test:all
 | Script | Description |
 |--------|-------------|
 | `npm run build` | Compile TypeScript to `dist/` |
-| `npm start` | Run the app (`node dist/index.js`) |
-| `npm test` | Run unit tests with Jest |
+| `npm start` | Run the app |
+| `npm run start:dev` | Run the app in watch mode |
+| `npm test` | Run unit tests |
+| `npm run test:watch` | Run unit tests in watch mode |
 | `npm run test:integ` | Run integration tests |
 | `npm run test:e2e` | Run E2E tests |
 | `npm run test:all` | Run unit, integ, and e2e in sequence |
-| `npm run test:ci` | Unit tests with coverage and JUnit output |
+| `npm run test:ci` | Unit tests with coverage and JUnit output (CI) |
+| `npm run migrate` | Run Sequelize migrations |
 | `npm run lint` | Lint and fix with ESLint |
-| `npm run format` | Format with Prettier |
-| `npm run format:check` | Check formatting |
+| `npm run format` | Format code with Prettier |
+| `npm run format:check` | Check code formatting |
+| `npm run release` | Run semantic-release |
+| `npm run audit:ci` | Run security audit (CI) |
 
 ## Environment variables
+
+Variables are loaded from the `.env` file (you can copy the `.env.dev` and customize it). Any variable already set in the environment takes precedence over values defined in `.env`.
 
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `PORT` | HTTP server port | `3000` |
+| `NODE_ENV` | Runtime environment (`development`, `production`, etc.). In production, automatic DB schema sync is disabled. | `development` |
+| `MYSQL_ROOT_PASSWORD` | MySQL root password (used by Docker Compose for the `db` service) | — |
+| `MYSQL_HOST` | MySQL server host | `localhost` |
+| `MYSQL_PORT` | MySQL server port | `3306` |
+| `MYSQL_USER` | MySQL connection username | `root` |
+| `MYSQL_PASSWORD` | MySQL connection password | *(empty)* |
+| `MYSQL_DATABASE` | Database name | `ecommerce` |
 
 ## Tech stack
 

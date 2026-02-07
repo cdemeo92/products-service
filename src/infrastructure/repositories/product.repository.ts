@@ -25,7 +25,7 @@ export class ProductRepository implements IProductRepository {
 
   async findByProductToken(productToken: string): Promise<Product | null> {
     const product = await this.model.findOne({ where: { productToken } });
-    
+
     return product ? new Product(product) : null;
   }
 
@@ -51,11 +51,14 @@ export class ProductRepository implements IProductRepository {
   }
 
   async update(id: number, product: Partial<ProductData>): Promise<Product | null> {
-    const [affected] = await this.model.update({
-      ...product.stock !== undefined ? { stock: product.stock } : {},
-      ...product.name !== undefined ? { name: product.name } : {},
-      ...product.price !== undefined ? { price: product.price } : {},
-    }, { where: { id } });
+    const [affected] = await this.model.update(
+      {
+        ...(product.stock !== undefined ? { stock: product.stock } : {}),
+        ...(product.name !== undefined ? { name: product.name } : {}),
+        ...(product.price !== undefined ? { price: product.price } : {}),
+      },
+      { where: { id } },
+    );
 
     if (affected === 0) return null;
 

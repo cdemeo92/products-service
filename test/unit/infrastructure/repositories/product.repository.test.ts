@@ -7,7 +7,15 @@ describe('ProductRepository', () => {
   let repository: ProductRepository;
   let model: MockProxy<typeof Products>;
 
-  const mockRow = (overrides: Partial<{ id: string; productToken: string; name: string; price: string; stock: number }> = {}) =>
+  const mockRow = (
+    overrides: Partial<{
+      id: string;
+      productToken: string;
+      name: string;
+      price: string;
+      stock: number;
+    }> = {},
+  ) =>
     ({
       id: '1',
       productToken: 'T1',
@@ -44,13 +52,15 @@ describe('ProductRepository', () => {
     it('should throw an error when the create operation fails', async () => {
       model.create.mockRejectedValue(new Error('Create failed'));
 
-      await expect(repository.create({ productToken: 'T1', name: 'Prod', price: 19.99, stock: 10 })).rejects.toThrow('Create failed');
+      await expect(
+        repository.create({ productToken: 'T1', name: 'Prod', price: 19.99, stock: 10 }),
+      ).rejects.toThrow('Create failed');
     });
   });
 
   describe('findById', () => {
     it('should return a Product when it exists', async () => {
-      const row = mockRow({id: '1', productToken: 'T1'});
+      const row = mockRow({ id: '1', productToken: 'T1' });
       model.findByPk.mockResolvedValue(row);
 
       const result = await repository.findById(1);
@@ -77,7 +87,7 @@ describe('ProductRepository', () => {
 
   describe('findByProductToken', () => {
     it('should return a Product a product with the given product token exists', async () => {
-      const row = mockRow({id: '1', productToken: 'T1'});
+      const row = mockRow({ id: '1', productToken: 'T1' });
       model.findOne.mockResolvedValue(row);
 
       const result = await repository.findByProductToken('T1');
@@ -111,7 +121,7 @@ describe('ProductRepository', () => {
       expect(result.data).toHaveLength(0);
       expect(result.total).toBe(0);
     });
-    
+
     it('should return PaginatedResult with data, total, page, limit, totalPages', async () => {
       const row = mockRow();
       model.findAndCountAll.mockResolvedValue({ rows: [row], count: 1 } as never);
@@ -145,7 +155,9 @@ describe('ProductRepository', () => {
     it('should throw an error when the findAndCountAll operation fails', async () => {
       model.findAndCountAll.mockRejectedValue(new Error('Find and count all failed'));
 
-      await expect(repository.findAllPaginated({ page: 1, limit: 10 })).rejects.toThrow('Find and count all failed');
+      await expect(repository.findAllPaginated({ page: 1, limit: 10 })).rejects.toThrow(
+        'Find and count all failed',
+      );
     });
   });
 
@@ -157,10 +169,7 @@ describe('ProductRepository', () => {
 
       const result = await repository.update(1, { stock: 20 });
 
-      expect(model.update).toHaveBeenCalledWith(
-        { stock: 20 },
-        { where: { id: 1 } },
-      );
+      expect(model.update).toHaveBeenCalledWith({ stock: 20 }, { where: { id: 1 } });
       expect(model.findByPk).toHaveBeenCalledWith(1);
       expect(result).toBeInstanceOf(Product);
       expect(result?.stock).toBe(20);
@@ -171,10 +180,7 @@ describe('ProductRepository', () => {
 
       const result = await repository.update(1, { stock: 20 });
 
-      expect(model.update).toHaveBeenCalledWith(
-        { stock: 20 },
-        { where: { id: 1 } },
-      );
+      expect(model.update).toHaveBeenCalledWith({ stock: 20 }, { where: { id: 1 } });
       expect(model.findByPk).not.toHaveBeenCalled();
       expect(result).toBeNull();
     });
@@ -196,10 +202,7 @@ describe('ProductRepository', () => {
 
       await repository.update(1, { name: 'New', price: 9.99 });
 
-      expect(model.update).toHaveBeenCalledWith(
-        { name: 'New', price: 9.99 },
-        { where: { id: 1 } },
-      );
+      expect(model.update).toHaveBeenCalledWith({ name: 'New', price: 9.99 }, { where: { id: 1 } });
       expect(model.findByPk).toHaveBeenCalledWith(1);
     });
 

@@ -56,6 +56,9 @@ jobs:
     name: Unit tests
     needs: install
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      checks: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

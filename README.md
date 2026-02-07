@@ -2,7 +2,7 @@
 
 [semantic-release: 📦🚀](https://github.com/semantic-release/semantic-release)
 [Conventional Commits](https://conventionalcommits.org)
-[purchase-cart-service:latest](https://github.com/cdemeo92/products-service/pkgs/container/products-service)
+[products-service:latest](https://github.com/cdemeo92/products-service/pkgs/container/products-service)
 
 NestJS backend microservice for an e-commerce platform to manage products in the database.
 
@@ -123,11 +123,11 @@ With the service running (e.g. on `http://localhost:3000`), you can try the foll
 
 ```bash
 git clone https://github.com/cdemeo92/products-service.git
-cd purchase-cart-service
+cd products-service
 npm i
 ```
 
-##### 2. Start the DB
+##### 2. Start the DB and set env
 
 With Docker installed, start the MySQL container:
 
@@ -135,7 +135,9 @@ With Docker installed, start the MySQL container:
 docker compose up -d db
 ```
 
-Wait until MySQL is ready (e.g. 10–15 seconds). The Compose stack uses user `root`, password `password`, and database `ecommerce` by default. To use this DB from the app, set `MYSQL_USER=root` and `MYSQL_PASSWORD=password` in your environment or in a `.env` file (see [Environment variables](#environment-variables)).
+Wait until MySQL is ready (e.g. 10–15 seconds).
+
+**Env for the app:** create a `.env` in the project root (e.g. copy from `.env.dev`) and set at least the DB connection to match the Compose defaults: `MYSQL_USER`, `MYSQL_PASSWORD`, `MYSQL_DATABASE`. Variables in `.env` are loaded at startup; any variable you set in the shell overrides the file. See [Environment variables](#environment-variables) for the full list.
 
 ##### 3. Build and run
 
@@ -162,11 +164,13 @@ npm run test:all
 | `npm run start:dev` | Run the app in watch mode |
 | `npm test` | Run unit tests |
 | `npm run test:watch` | Run unit tests in watch mode |
+| `npm run test:ci` | Unit tests with coverage and JUnit output (CI) |
 | `npm run test:integ` | Run integration tests |
 | `npm run test:e2e` | Run E2E tests |
 | `npm run test:all` | Run unit, integ, and e2e in sequence |
-| `npm run test:ci` | Unit tests with coverage and JUnit output (CI) |
 | `npm run migrate` | Run Sequelize migrations |
+| `npm run migration:generate -- [nome]` | Create a new migration file |
+| `npm run generate:models` | Generate Sequelize models from DB (uses `.env`) |
 | `npm run lint` | Lint and fix with ESLint |
 | `npm run format` | Format code with Prettier |
 | `npm run format:check` | Check code formatting |

@@ -37,8 +37,7 @@ async function main() {
   const port = parseInt(process.env.PORT || '3000', 10);
   await app.listen(port);
 
-  const url = (await app.getUrl()).replace(/\[::1\]|127\.0\.0\.1/, 'localhost');
-  console.log(`Server listening on ${url}`);
+  console.log(`Server listening on http://localhost:${port}`);
 }
 
 main().catch((err) => {

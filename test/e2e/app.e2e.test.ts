@@ -22,7 +22,7 @@ describe('App (e2e)', () => {
       })
       .withBuild()
       .withWaitStrategy('db-1', Wait.forLogMessage('ready for connections'))
-      .withWaitStrategy('app-1', Wait.forHttp('/health', 6000))
+      .withWaitStrategy('app-1', Wait.forLogMessage('Server listening'))
       .up(['db', 'app']);
 
     const appContainer = composeEnv.getContainer('app-1');

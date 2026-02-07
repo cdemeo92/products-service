@@ -16,6 +16,7 @@ NestJS backend microservice for an e-commerce platform to manage products in the
 - The application can be run as a single container (or process) by configuring env vars to connect to an existing MySQL; the user ensures the database and schema exist (see docs).
 - Authentication or authorization are out of scope.
 - `productToken` is the unique business identifier and idempotency key for a product (client-provided in create). Duplicate `productToken` on create → 409 Conflict.
+- Different currencies are not considered; prices are treated as plain numeric values with no currency or multi-currency support.
 
 ## Potential evolutions
 
@@ -169,6 +170,8 @@ npm run test:all
 | `npm run test:e2e` | Run E2E tests |
 | `npm run test:all` | Run unit, integ, and e2e in sequence |
 | `npm run migrate` | Run Sequelize migrations |
+| `npm run migrate:undo` | Rollback the last executed migration |
+| `npm run migrate:undo:all` | Rollback all migrations |
 | `npm run migration:generate -- [nome]` | Create a new migration file |
 | `npm run generate:models` | Generate Sequelize models from DB (uses `.env`) |
 | `npm run lint` | Lint and fix with ESLint |

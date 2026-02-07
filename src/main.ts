@@ -22,7 +22,7 @@ async function main() {
 
   const config = new DocumentBuilder()
     .setTitle('Products Service')
-    .setDescription('Product CRUD API with MySQL and Sequelize')
+    .setDescription('Product CRUD API for an e-commerce platform.')
     .setVersion(process.env.npm_package_version || '1.0.0')
     .build();
   const document = SwaggerModule.createDocument(app, config);

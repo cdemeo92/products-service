@@ -6,5 +6,6 @@ case "${1:-start}" in
   test:e2e)   exec npm run test:e2e ;;
   test:all)   exec npm run test:all ;;
   start)      npx sequelize-cli db:migrate && exec node dist/main.js ;;
+  start:dev)  npx sequelize-cli db:migrate && exec npm run start:dev ;;
   *)          exec "$@" ;;
 esac

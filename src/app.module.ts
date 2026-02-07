@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { TerminusModule } from '@nestjs/terminus';
 import { HealthController } from './infrastructure/controllers/health.controller';
+import { ProductsModule } from './infrastructure/controllers/products/products.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { HealthController } from './infrastructure/controllers/health.controller
         synchronize: process.env.NODE_ENV !== 'production',
       }),
     }),
+    ProductsModule,
   ],
   controllers: [HealthController],
 })

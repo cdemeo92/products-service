@@ -2,9 +2,6 @@ name: Products Service CI/CD
 run-name: ${{ github.actor }} is running
 env:
   NODE_VERSION: "24"
-  MYSQL_USER: app
-  MYSQL_PASSWORD: app
-  MYSQL_DATABASE: ecommerce
 on:
   push:
     branches:
@@ -85,11 +82,6 @@ jobs:
     services:
       mysql:
         image: mysql:8
-        env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_USER: ${{ env.MYSQL_USER }}
-          MYSQL_PASSWORD: ${{ env.MYSQL_PASSWORD }}
-          MYSQL_DATABASE: ${{ env.MYSQL_DATABASE }}
         ports:
           - 3306:3306
         options: >-
@@ -110,12 +102,6 @@ jobs:
             node_modules
       - name: Run integration tests
         run: npm run test:integ
-        env:
-          MYSQL_HOST: 127.0.0.1
-          MYSQL_PORT: 3306
-          MYSQL_USER: ${{ env.MYSQL_USER }}
-          MYSQL_PASSWORD: ${{ env.MYSQL_PASSWORD }}
-          MYSQL_DATABASE: ${{ env.MYSQL_DATABASE }}
 
   e2e:
     name: E2E tests
@@ -124,11 +110,6 @@ jobs:
     services:
       mysql:
         image: mysql:8
-        env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_USER: ${{ env.MYSQL_USER }}
-          MYSQL_PASSWORD: ${{ env.MYSQL_PASSWORD }}
-          MYSQL_DATABASE: ${{ env.MYSQL_DATABASE }}
         ports:
           - 3306:3306
         options: >-

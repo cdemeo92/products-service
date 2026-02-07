@@ -1,7 +1,7 @@
 import { Product } from '../../../../src/application/domain/entities/product.entity';
 import { ProductRepository } from '../../../../src/infrastructure/repositories/product.repository';
 import { mock, MockProxy } from 'jest-mock-extended';
-import type { Products } from '../../../../src/infrastructure/repositories/models';
+import { Products } from '../../../../src/infrastructure/repositories/models';
 
 describe('ProductRepository', () => {
   let repository: ProductRepository;

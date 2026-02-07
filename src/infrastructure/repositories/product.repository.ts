@@ -17,18 +17,6 @@ export class ProductRepository implements IProductRepository {
     return new Product(createdProduct);
   }
 
-  async findById(id: string): Promise<Product | null> {
-    const product = await this.model.findByPk(id);
-
-    return product ? new Product(product) : null;
-  }
-
-  async findByProductToken(productToken: string): Promise<Product | null> {
-    const product = await this.model.findOne({ where: { productToken } });
-
-    return product ? new Product(product) : null;
-  }
-
   async findAllPaginated(options: PaginationOptions): Promise<PaginatedResult<Product>> {
     const { page, limit } = options;
     const offset = (page - 1) * limit;

@@ -15,10 +15,6 @@ export class ProductsApplication {
     throw new Error('Not implemented');
   }
 
-  async findOne(id: string): Promise<Product> {
-    throw new Error('Not implemented');
-  }
-
   async update(id: string, product: Partial<ProductData>): Promise<Product> {
     throw new Error('Not implemented');
   }

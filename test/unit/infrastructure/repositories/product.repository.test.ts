@@ -58,60 +58,6 @@ describe('ProductRepository', () => {
     });
   });
 
-  describe('findById', () => {
-    it('should return a Product when it exists', async () => {
-      const row = mockRow({ id: '1', productToken: 'T1' });
-      model.findByPk.mockResolvedValue(row);
-
-      const result = await repository.findById('1');
-
-      expect(model.findByPk).toHaveBeenCalledWith('1');
-      expect(result).toBeInstanceOf(Product);
-      expect(result?.productToken).toBe('T1');
-    });
-
-    it('should return null when the product does not exist', async () => {
-      model.findByPk.mockResolvedValue(null);
-
-      const result = await repository.findById('1');
-
-      expect(result).toBeNull();
-    });
-
-    it('should throw an error when the find operation fails', async () => {
-      model.findByPk.mockRejectedValue(new Error('Find failed'));
-
-      await expect(repository.findById('1')).rejects.toThrow('Find failed');
-    });
-  });
-
-  describe('findByProductToken', () => {
-    it('should return a Product a product with the given product token exists', async () => {
-      const row = mockRow({ id: '1', productToken: 'T1' });
-      model.findOne.mockResolvedValue(row);
-
-      const result = await repository.findByProductToken('T1');
-
-      expect(model.findOne).toHaveBeenCalledWith({ where: { productToken: 'T1' } });
-      expect(result).toBeInstanceOf(Product);
-      expect(result?.productToken).toBe('T1');
-    });
-
-    it('should return null when does not exist a product with the given product token', async () => {
-      model.findOne.mockResolvedValue(null);
-
-      const result = await repository.findByProductToken('T1');
-
-      expect(result).toBeNull();
-    });
-
-    it('should throw an error when the find operation fails', async () => {
-      model.findOne.mockRejectedValue(new Error('Find failed'));
-
-      await expect(repository.findByProductToken('T1')).rejects.toThrow('Find failed');
-    });
-  });
-
   describe('findAllPaginated', () => {
     it('should return PaginatedResult with empty data when there are no products', async () => {
       model.findAndCountAll.mockResolvedValue({ rows: [], count: 0 } as never);

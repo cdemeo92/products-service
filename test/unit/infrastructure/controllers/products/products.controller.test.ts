@@ -116,19 +116,6 @@ describe('ProductsController', () => {
     });
   });
 
-  describe('findOne', () => {
-    it('should invoke application findOne with the id and return a ProductDto', async () => {
-      const product = mockProduct();
-      productsApplication.findOne.mockResolvedValue(product);
-
-      const result = await controller.findOne('42');
-
-      expect(productsApplication.findOne).toHaveBeenCalledWith('42');
-      expect(productsApplication.findOne).toHaveBeenCalledTimes(1);
-      expect(result).toBeInstanceOf(ProductDto);
-    });
-  });
-
   describe('update', () => {
     it('should invoke application update with the id and return a ProductDto', async () => {
       const dto: UpdateProductDto = { stock: 20 };

@@ -66,20 +66,6 @@ export class ProductsController {
     );
   }
 
-  @Get(':id')
-  @ApiOperation({
-    summary: 'Get a product by id',
-    description: 'Returns a single product by its id.',
-  })
-  @ApiParam({ name: 'id', description: 'Product id' })
-  @ApiResponse({ status: 200, description: 'Product found', type: ProductDto })
-  @ApiResponse({ status: 404, description: 'Product not found' })
-  async findOne(@Param('id') id: string): Promise<ProductDto> {
-    const product = await this.productsApplication.findOne(id);
-
-    return new ProductDto(product);
-  }
-
   @Patch(':id')
   @ApiOperation({
     summary: 'Update a product',

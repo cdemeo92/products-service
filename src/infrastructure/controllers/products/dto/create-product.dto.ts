@@ -4,7 +4,8 @@ import { IsString, MinLength, MaxLength, IsNumber, Min, IsInt } from 'class-vali
 export class CreateProductDto {
   @ApiProperty({
     example: 'TOKEN-001',
-    description: 'Unique product token. Business identifier and idempotency key (client-provided). Duplicate value returns 409 Conflict.',
+    description:
+      'Unique product token. Business identifier and idempotency key (client-provided). Duplicate value returns 409 Conflict.',
     maxLength: 255,
   })
   @IsString()

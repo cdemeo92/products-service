@@ -14,8 +14,7 @@ export class HealthController {
   @HealthCheck()
   @ApiOperation({
     summary: 'Health check',
-    description:
-      'Returns the health status of the service and database connection.',
+    description: 'Returns the health status of the service and database connection.',
   })
   @ApiResponse({ status: 200, description: 'Service and database are healthy' })
   @ApiResponse({ status: 503, description: 'Service unhealthy' })

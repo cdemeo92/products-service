@@ -32,7 +32,11 @@ export class ProductsController {
     summary: 'Read products paginated',
     description: 'Retrieves a paginated list of all products.',
   })
-  @ApiResponse({ status: 200, description: 'Paginated list of products', type: PaginatedProductsDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Paginated list of products',
+    type: PaginatedProductsDto,
+  })
   async findAll(@Query() query: PaginationQueryDto): Promise<PaginatedProductsDto> {
     this.productsApplication.findAll();
 
@@ -56,14 +60,16 @@ export class ProductsController {
   @Patch(':id')
   @ApiOperation({
     summary: 'Update a product',
-    description:
-      'Updates a product by id. Only provided fields are updated.',
+    description: 'Updates a product by id. Only provided fields are updated.',
   })
   @ApiParam({ name: 'id', description: 'Product id' })
   @ApiResponse({ status: 200, description: 'Product updated', type: ProductDto })
   @ApiResponse({ status: 404, description: 'Product not found' })
   @ApiResponse({ status: 400, description: 'Validation error' })
-  async update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto): Promise<ProductDto> {
+  async update(
+    @Param('id') id: string,
+    @Body() updateProductDto: UpdateProductDto,
+  ): Promise<ProductDto> {
     this.productsApplication.update(+id);
 
     return new ProductDto();

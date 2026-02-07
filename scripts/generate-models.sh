@@ -8,7 +8,7 @@ dotenv -e .env -- sh -c 'npx stg -D mysql \
   -u "$MYSQL_USER" \
   -x "$MYSQL_PASSWORD" \
   -o src/infrastructure/repositories/models \
-  --case camel \
+  --case pascal:camel \
   -i -m \
   -T SequelizeMeta \
   --clean'

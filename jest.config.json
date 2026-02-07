@@ -10,7 +10,7 @@
     "^.+\\.(t|j)s$": "ts-jest"
   },
   "coverageProvider": "v8",
-  "collectCoverageFrom": ["src/**/*.ts", "!src/main.ts","!src/infrastructure/controllers/health.controller.ts"],
+  "collectCoverageFrom": ["src/**/*.ts", "!src/main.ts", "!src/**/*.module.ts", "!src/infrastructure/controllers/health.controller.ts"],
   "collectCoverage": true,
   "coverageDirectory": "coverage",
   "coverageReporters": [

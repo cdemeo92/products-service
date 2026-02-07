@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+  UseFilters,
+} from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ProductsApplication } from '../../../application/products.applicaton';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -6,9 +16,11 @@ import { ProductDto } from './dto/product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { PaginationQueryDto } from './dto/pagination-query.dto';
 import { PaginatedProductsDto } from './dto/paginated-products.dto';
+import { ProductsExceptionFilter } from './exceptions/exception.filter';
 
 @ApiTags('Products')
 @Controller('products')
+@UseFilters(ProductsExceptionFilter)
 export class ProductsController {
   constructor(private readonly productsApplication: ProductsApplication) {}
 
@@ -22,9 +34,9 @@ export class ProductsController {
   @ApiResponse({ status: 409, description: 'Conflict — productToken already exists' })
   @ApiResponse({ status: 400, description: 'Validation error (invalid or missing fields)' })
   async create(@Body() createProductDto: CreateProductDto): Promise<ProductDto> {
-    this.productsApplication.create();
+    const product = await this.productsApplication.create(createProductDto);
 
-    return new ProductDto();
+    return new ProductDto(product);
   }
 
   @Get()
@@ -38,9 +50,20 @@ export class ProductsController {
     type: PaginatedProductsDto,
   })
   async findAll(@Query() query: PaginationQueryDto): Promise<PaginatedProductsDto> {
-    this.productsApplication.findAll();
+    const result = await this.productsApplication.findAll({
+      page: query.page,
+      limit: query.limit,
+    });
 
-    return new PaginatedProductsDto();
+    return new PaginatedProductsDto(
+      result.data.map((product) => new ProductDto(product)),
+      {
+        page: result.page,
+        limit: result.limit,
+        total: result.total,
+        totalPages: result.totalPages,
+      },
+    );
   }
 
   @Get(':id')
@@ -52,9 +75,9 @@ export class ProductsController {
   @ApiResponse({ status: 200, description: 'Product found', type: ProductDto })
   @ApiResponse({ status: 404, description: 'Product not found' })
   async findOne(@Param('id') id: string): Promise<ProductDto> {
-    this.productsApplication.findOne(+id);
+    const product = await this.productsApplication.findOne(id);
 
-    return new ProductDto();
+    return new ProductDto(product);
   }
 
   @Patch(':id')
@@ -70,9 +93,9 @@ export class ProductsController {
     @Param('id') id: string,
     @Body() updateProductDto: UpdateProductDto,
   ): Promise<ProductDto> {
-    this.productsApplication.update(+id);
+    const product = await this.productsApplication.update(id, updateProductDto);
 
-    return new ProductDto();
+    return new ProductDto(product);
   }
 
   @Delete(':id')
@@ -83,7 +106,7 @@ export class ProductsController {
   @ApiParam({ name: 'id', description: 'Product id' })
   @ApiResponse({ status: 204, description: 'Product deleted successfully' })
   @ApiResponse({ status: 404, description: 'Product not found' })
-  remove(@Param('id') id: string) {
-    return this.productsApplication.remove(+id);
+  remove(@Param('id') id: string): Promise<void> {
+    return this.productsApplication.remove(id);
   }
 }

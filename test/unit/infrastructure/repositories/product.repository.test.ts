@@ -63,9 +63,9 @@ describe('ProductRepository', () => {
       const row = mockRow({ id: '1', productToken: 'T1' });
       model.findByPk.mockResolvedValue(row);
 
-      const result = await repository.findById(1);
+      const result = await repository.findById('1');
 
-      expect(model.findByPk).toHaveBeenCalledWith(1);
+      expect(model.findByPk).toHaveBeenCalledWith('1');
       expect(result).toBeInstanceOf(Product);
       expect(result?.productToken).toBe('T1');
     });
@@ -73,7 +73,7 @@ describe('ProductRepository', () => {
     it('should return null when the product does not exist', async () => {
       model.findByPk.mockResolvedValue(null);
 
-      const result = await repository.findById(1);
+      const result = await repository.findById('1');
 
       expect(result).toBeNull();
     });
@@ -81,7 +81,7 @@ describe('ProductRepository', () => {
     it('should throw an error when the find operation fails', async () => {
       model.findByPk.mockRejectedValue(new Error('Find failed'));
 
-      await expect(repository.findById(1)).rejects.toThrow('Find failed');
+      await expect(repository.findById('1')).rejects.toThrow('Find failed');
     });
   });
 
@@ -167,10 +167,10 @@ describe('ProductRepository', () => {
       model.update.mockResolvedValue([1]);
       model.findByPk.mockResolvedValue(row);
 
-      const result = await repository.update(1, { stock: 20 });
+      const result = await repository.update('1', { stock: 20 });
 
-      expect(model.update).toHaveBeenCalledWith({ stock: 20 }, { where: { id: 1 } });
-      expect(model.findByPk).toHaveBeenCalledWith(1);
+      expect(model.update).toHaveBeenCalledWith({ stock: 20 }, { where: { id: '1' } });
+      expect(model.findByPk).toHaveBeenCalledWith('1');
       expect(result).toBeInstanceOf(Product);
       expect(result?.stock).toBe(20);
     });
@@ -178,9 +178,9 @@ describe('ProductRepository', () => {
     it('should return null when does not exist a product with the given id', async () => {
       model.update.mockResolvedValue([0]);
 
-      const result = await repository.update(1, { stock: 20 });
+      const result = await repository.update('1', { stock: 20 });
 
-      expect(model.update).toHaveBeenCalledWith({ stock: 20 }, { where: { id: 1 } });
+      expect(model.update).toHaveBeenCalledWith({ stock: 20 }, { where: { id: '1' } });
       expect(model.findByPk).not.toHaveBeenCalled();
       expect(result).toBeNull();
     });
@@ -189,9 +189,9 @@ describe('ProductRepository', () => {
       model.update.mockResolvedValue([1]);
       model.findByPk.mockResolvedValue(null);
 
-      const result = await repository.update(1, { stock: 20 });
+      const result = await repository.update('1', { stock: 20 });
 
-      expect(model.findByPk).toHaveBeenCalledWith(1);
+      expect(model.findByPk).toHaveBeenCalledWith('1');
       expect(result).toBeNull();
     });
 
@@ -200,16 +200,19 @@ describe('ProductRepository', () => {
       model.update.mockResolvedValue([1]);
       model.findByPk.mockResolvedValue(row);
 
-      await repository.update(1, { name: 'New', price: 9.99 });
+      await repository.update('1', { name: 'New', price: 9.99 });
 
-      expect(model.update).toHaveBeenCalledWith({ name: 'New', price: 9.99 }, { where: { id: 1 } });
-      expect(model.findByPk).toHaveBeenCalledWith(1);
+      expect(model.update).toHaveBeenCalledWith(
+        { name: 'New', price: 9.99 },
+        { where: { id: '1' } },
+      );
+      expect(model.findByPk).toHaveBeenCalledWith('1');
     });
 
     it('should throw an error when the update operation fails', async () => {
       model.update.mockRejectedValue(new Error('Update failed'));
 
-      await expect(repository.update(1, { stock: 20 })).rejects.toThrow('Update failed');
+      await expect(repository.update('1', { stock: 20 })).rejects.toThrow('Update failed');
     });
   });
 
@@ -217,16 +220,16 @@ describe('ProductRepository', () => {
     it('should return true the product exists and the delete operation succeeds', async () => {
       model.destroy.mockResolvedValue(1);
 
-      const result = await repository.delete(1);
+      const result = await repository.delete('1');
 
-      expect(model.destroy).toHaveBeenCalledWith({ where: { id: 1 } });
+      expect(model.destroy).toHaveBeenCalledWith({ where: { id: '1' } });
       expect(result).toBe(true);
     });
 
     it('should return false when the product does not exist', async () => {
       model.destroy.mockResolvedValue(0 as never);
 
-      const result = await repository.delete(1);
+      const result = await repository.delete('1');
 
       expect(result).toBe(false);
     });
@@ -234,7 +237,7 @@ describe('ProductRepository', () => {
     it('should throw an error when the delete operation fails', async () => {
       model.destroy.mockRejectedValue(new Error('Delete failed'));
 
-      await expect(repository.delete(1)).rejects.toThrow('Delete failed');
+      await expect(repository.delete('1')).rejects.toThrow('Delete failed');
     });
   });
 });

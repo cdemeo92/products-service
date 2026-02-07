@@ -1,21 +1,29 @@
+import { Product } from './domain/entities/product.entity';
+import {
+  CreateProductInput,
+  PaginationOptions,
+  PaginatedResult,
+  ProductData,
+} from './ports/product-repository.port';
+
 export class ProductsApplication {
-  create() {
-    return 'This action adds a new product';
+  async create(product: CreateProductInput): Promise<Product> {
+    throw new Error('Not implemented');
   }
 
-  findAll() {
-    return `This action returns all products`;
+  async findAll(options: PaginationOptions): Promise<PaginatedResult<Product>> {
+    throw new Error('Not implemented');
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} product`;
+  async findOne(id: string): Promise<Product> {
+    throw new Error('Not implemented');
   }
 
-  update(id: number) {
-    return `This action updates a #${id} product`;
+  async update(id: string, product: Partial<ProductData>): Promise<Product> {
+    throw new Error('Not implemented');
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} product`;
+  async remove(id: string): Promise<void> {
+    throw new Error('Not implemented');
   }
 }

@@ -24,10 +24,10 @@ export interface PaginatedResult<T> {
 }
 
 export interface IProductRepository {
-  create(input: CreateProductInput): Promise<Product>;
-  findById(id: number): Promise<Product | null>;
+  create(product: CreateProductInput): Promise<Product>;
+  findById(id: string): Promise<Product | null>;
   findByProductToken(productToken: string): Promise<Product | null>;
   findAllPaginated(options: PaginationOptions): Promise<PaginatedResult<Product>>;
-  update(id: number, product: Partial<ProductData>): Promise<Product | null>;
-  delete(id: number): Promise<boolean>;
+  update(id: string, product: Partial<ProductData>): Promise<Product | null>;
+  delete(id: string): Promise<boolean>;
 }

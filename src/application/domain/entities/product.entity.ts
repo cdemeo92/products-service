@@ -1,5 +1,3 @@
-import { Products } from 'src/infrastructure/repositories/models';
-
 export class Product {
   public readonly id?: string;
   public readonly productToken: string;

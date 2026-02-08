@@ -1,6 +1,9 @@
 {
   "name": "products-service",
-  "image": "node:24",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": "."
+  },
   "runArgs": ["--platform=linux/arm64"],
   "features": {
     "ghcr.io/devcontainers/features/docker-in-docker:2": {}

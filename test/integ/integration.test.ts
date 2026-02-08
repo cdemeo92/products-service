@@ -9,6 +9,8 @@ import { ProductRepository } from '../../src/infrastructure/repositories/product
 import { ProductsModule } from '../../src/infrastructure/controllers/products/products.module';
 import { ProductsApplication } from '../../src/application/products.applicaton';
 
+jest.setTimeout(120_000);
+
 let db: Awaited<ReturnType<typeof createDB>>;
 
 beforeAll(async () => {
@@ -23,7 +25,7 @@ beforeAll(async () => {
   process.env.MYSQL_PASSWORD = '';
   process.env.MYSQL_DATABASE = db.dbName;
   execSync('npx sequelize-cli db:migrate', { env: process.env, stdio: 'pipe' });
-}, 30000);
+}, 120_000);
 
 afterAll(async () => {
   await db?.stop();

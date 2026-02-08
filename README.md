@@ -6,6 +6,24 @@
 
 NestJS backend microservice for an e-commerce platform to manage products in the database.
 
+## Table of contents
+
+- [Requirements & scope](#requirements--scope)
+- [Assumptions](#assumptions)
+- [Potential evolutions](#potential-evolutions)
+- [Project structure](#project-structure)
+- [Testing strategy](#testing-strategy)
+- [Live demo](#live-demo)
+- [Demo](#demo)
+- [Usage](#usage)
+- [Getting started](#getting-started)
+  - [Local Development](#local-development)
+  - [Scripts](#scripts)
+- [Environment variables](#environment-variables)
+- [Tech stack](#tech-stack)
+- [Conventions](#conventions)
+- [License](#license)
+
 ## Requirements & scope
 
 **Objective:** Build a NestJS microservice that manages products for an e-commerce platform, using Sequelize as the ORM and MySQL as the database. The service exposes CRUD over products with validation, error handling, and pagination for listing.

@@ -8,5 +8,7 @@
   "moduleFileExtensions": ["ts", "js", "json"],
   "transform": {
     "^.+\\.(t|j)s$": "ts-jest"
-  }
+  },
+  "detectOpenHandles": true,
+  "forceExit": true
 }

@@ -1,5 +1,4 @@
 #!/bin/sh
 set -e
-docker compose build
-docker compose run --rm app test:all
-docker compose down
+docker build -t products-service .
+docker run --rm -v /var/run/docker.sock:/var/run/docker.sock --user root products-service test:all

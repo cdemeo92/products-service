@@ -60,7 +60,7 @@ This project follows a **hexagonal architecture** (also known as ports and adapt
 
 ## Live demo
 
-The project is deployed automatically via [GitHub Actions](https://github.com/cdemeo92/products-service/actions) on every release to `main`. A live instance is available at **[https://products-service-production.up.railway.app/](https://products-service-production.up.railway.app/)**. The root URL redirects to `/docs`, where you can try the API interactively (Swagger UI).
+The project is deployed automatically via [GitHub Actions](https://github.com/cdemeo92/products-service/actions) on every release to `main`. A live instance is available at **[https://products-service-production-27c9.up.railway.app/](https://products-service-production-27c9.up.railway.app/)**. The root URL redirects to `/docs`, where you can try the API interactively (Swagger UI).
 
 ## Demo
 

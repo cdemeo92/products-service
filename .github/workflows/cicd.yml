@@ -143,3 +143,31 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm run release
+
+deploy:
+    name: Deploy
+    needs: publish
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    container: ghcr.io/railwayapp/cli:latest
+    steps:
+      - name: Redeploy on Railway
+        run: railway redeploy --yes --service ${{ vars.RAILWAY_SERVICE }}
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_DEPLOY_TOKEN }}
+
+smoke:
+    name: Smoke tests
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Smoke test
+        run: |
+          echo "Running smoke tests..."
+          CODE=$(curl -sS -w "%{http_code}" -o /tmp/smoke-body.txt -L "https://products-service-production-27c9.up.railway.app/health")
+          if [ "$CODE" != "200" ]; then
+            echo "Smoke test failed: expected 200, got $CODE"
+            cat /tmp/smoke-body.txt
+            exit 1
+          fi
+          echo "Health check passed: status $CODE"

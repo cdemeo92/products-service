@@ -58,6 +58,35 @@ describe('ProductRepository', () => {
     });
   });
 
+  describe('findByProductToken', () => {
+    it('should return a Product when a product with the given productToken exists', async () => {
+      const row = mockRow({ productToken: 'TOKEN-123' });
+      model.findOne.mockResolvedValue(row);
+
+      const result = await repository.findByProductToken('TOKEN-123');
+
+      expect(model.findOne).toHaveBeenCalledWith({ where: { productToken: 'TOKEN-123' } });
+      expect(result).toBeInstanceOf(Product);
+      expect(result?.productToken).toBe('TOKEN-123');
+      expect(result?.id).toBe('1');
+    });
+
+    it('should return null when no product exists with the given productToken', async () => {
+      model.findOne.mockResolvedValue(null);
+
+      const result = await repository.findByProductToken('NON-EXISTENT');
+
+      expect(model.findOne).toHaveBeenCalledWith({ where: { productToken: 'NON-EXISTENT' } });
+      expect(result).toBeNull();
+    });
+
+    it('should throw an error when the findOne operation fails', async () => {
+      model.findOne.mockRejectedValue(new Error('Find one failed'));
+
+      await expect(repository.findByProductToken('TOKEN-123')).rejects.toThrow('Find one failed');
+    });
+  });
+
   describe('findAllPaginated', () => {
     it('should return PaginatedResult with empty data when there are no products', async () => {
       model.findAndCountAll.mockResolvedValue({ rows: [], count: 0 } as never);

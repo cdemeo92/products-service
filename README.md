@@ -23,40 +23,43 @@ NestJS backend microservice for an e-commerce platform to manage products in the
 To make this service robust and production-ready, the following would be added or extended:
 
 - **Security** – Authentication and authorization (e.g. JWT or API keys) and HTTPS only.
+- **Search filters** – Extend the product listing with query parameters (e.g. by name, price range, stock) to filter search results.
+- **Get single product** – Add an API endpoint to retrieve a single product by id or by productToken.
 
 ## Project structure
 
 This project follows a **hexagonal architecture** (also known as ports and adapters) to ensure business logic remains independent from frameworks and infrastructure. The core application layer (`application/`) is completely reusable and can be integrated with different databases or HTTP frameworks by simply swapping adapters in the `infrastructure/` layer. This separation provides better testability, maintainability, and flexibility for future changes.
 
 ```
+├── migrations/               Sequelize migrations
 ├── postman/
 │   └── Products-Service.postman_collection.json   Postman collection (all API scenarios)
 ├── src/
 │   ├── application/          Core business logic (framework-agnostic)
 │   │   ├── domain/           Domain layer
-│   │   │   ├── entities/     Domain entities (Order, Product, OrderItem)
-│   │   │   ├── exceptions/   Domain exceptions
-│   │   │   └── value-objects/ Value objects (Money)
-│   │   ├── ports/            Interfaces (repository and HTTP server contracts)
-│   │   └── use-cases/        Application use cases
-│   ├── infrastructure/       Infrastructure adapters
-│   │   ├── repositories/     Sequelize based repository implementations
-│   │   ├── database/         MySQL database initialization
-│   │   └── adapters/
-│   │       └── nest/         Nest HTTP adapter
-│   └── main.ts               Composition root
+│   │   │   ├── entities/     Domain entities
+│   │   │   └── exceptions/   Domain exceptions
+│   │   ├── ports/            Interfaces (repository contracts)
+│   │   ├── use-cases/        Application use cases
+│   │   └── products.applicaton.ts   Application composition
+│   ├── infrastructure/
+│   │   ├── controllers/      NestJS HTTP controllers (health, products)
+│   │   │   └── products/     DTOs, exception filters, products module
+│   │   └── repositories/     Sequelize models and repository implementations
+│   ├── app.module.ts         NestJS root module
+│   └── main.ts               Application entry point
 ├── test/
-│   ├── unit/                 Unit tests (business logic)
+│   ├── unit/                 Unit tests (use cases, repositories, controllers business logic)
 │   ├── integ/                Integration tests (component integration)
 │   └── e2e/                  End-to-end tests (full flows)
 ```
 
 ## Testing strategy
 
-- **Unit tests** (`test/unit/`) — Fast, focused tests that cover domain entities, value objects, use cases, and adapters. They give quick feedback on business rules and edge cases without starting the full stack.
-- **Integration tests** (`test/integ/`) — Use a real SQLite database and real repositories. They verify that the use case and persistence layer work together.
-- **E2E tests** (`test/e2e/`) — Hit the real HTTP API. They validate the full stack from request to response.
-- **Smoke test** (CI, after deploy) — A single request to the root URL to confirm the deployed container is up.
+- **Unit tests** (`test/unit/`) — Fast, focused tests that give quick feedback on business rules and edge cases without starting the full stack. They run in isolation with mocked dependencies.
+- **Integration tests** (`test/integ/`) — Run against an in-memory database to quickly verify that use cases and the persistence layer integrate correctly, without spinning up external services.
+- **E2E tests** (`test/e2e/`) — Start an instance of the application and its dependencies (mySQL database) in containers, then exercise the real HTTP API end-to-end, validating the full stack from request to response.
+- **Smoke test** (CI, after deploy) — A single request to the health API in production to confirm the deployed service is up and responding.
 
 ## Live demo
 

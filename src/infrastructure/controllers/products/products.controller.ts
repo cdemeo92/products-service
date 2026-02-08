@@ -50,10 +50,7 @@ export class ProductsController {
     type: PaginatedProductsDto,
   })
   async findAll(@Query() query: PaginationQueryDto): Promise<PaginatedProductsDto> {
-    const result = await this.productsApplication.findAll({
-      page: query.page,
-      limit: query.limit,
-    });
+    const result = await this.productsApplication.findAll(query.page, query.limit);
 
     return new PaginatedProductsDto(
       result.data.map((product) => new ProductDto(product)),

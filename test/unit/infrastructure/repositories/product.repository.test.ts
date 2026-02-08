@@ -87,21 +87,26 @@ describe('ProductRepository', () => {
     });
   });
 
-  describe('findAllPaginated', () => {
-    it('should return PaginatedResult with empty data when there are no products', async () => {
+  describe('findWithLimitOffset', () => {
+    it('should return data and total when there are no products', async () => {
       model.findAndCountAll.mockResolvedValue({ rows: [], count: 0 } as never);
 
-      const result = await repository.findAllPaginated({ page: 1, limit: 10 });
+      const result = await repository.findWithLimitOffset(10, 0);
 
+      expect(model.findAndCountAll).toHaveBeenCalledWith({
+        limit: 10,
+        offset: 0,
+        order: [['id', 'ASC']],
+      });
       expect(result.data).toHaveLength(0);
       expect(result.total).toBe(0);
     });
 
-    it('should return PaginatedResult with data, total, page, limit, totalPages', async () => {
+    it('should return data and total with limit and offset', async () => {
       const row = mockRow();
       model.findAndCountAll.mockResolvedValue({ rows: [row], count: 1 } as never);
 
-      const result = await repository.findAllPaginated({ page: 1, limit: 10 });
+      const result = await repository.findWithLimitOffset(10, 0);
 
       expect(model.findAndCountAll).toHaveBeenCalledWith({
         limit: 10,
@@ -111,26 +116,24 @@ describe('ProductRepository', () => {
       expect(result.data).toHaveLength(1);
       expect(result.data[0]).toBeInstanceOf(Product);
       expect(result.total).toBe(1);
-      expect(result.page).toBe(1);
-      expect(result.limit).toBe(10);
-      expect(result.totalPages).toBe(1);
     });
 
-    it('should compute offset and totalPages correctly for page 2', async () => {
+    it('should pass limit and offset to findAndCountAll', async () => {
       model.findAndCountAll.mockResolvedValue({ rows: [], count: 25 } as never);
 
-      const result = await repository.findAllPaginated({ page: 2, limit: 10 });
+      await repository.findWithLimitOffset(10, 10);
 
-      expect(model.findAndCountAll).toHaveBeenCalledWith(
-        expect.objectContaining({ limit: 10, offset: 10 }),
-      );
-      expect(result.totalPages).toBe(3);
+      expect(model.findAndCountAll).toHaveBeenCalledWith({
+        limit: 10,
+        offset: 10,
+        order: [['id', 'ASC']],
+      });
     });
 
     it('should throw an error when the findAndCountAll operation fails', async () => {
       model.findAndCountAll.mockRejectedValue(new Error('Find and count all failed'));
 
-      await expect(repository.findAllPaginated({ page: 1, limit: 10 })).rejects.toThrow(
+      await expect(repository.findWithLimitOffset(10, 0)).rejects.toThrow(
         'Find and count all failed',
       );
     });

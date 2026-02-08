@@ -2,8 +2,6 @@ import type {
   IProductRepository,
   CreateProductInput,
   ProductData,
-  PaginationOptions,
-  PaginatedResult,
 } from '../../application/ports/product-repository.port';
 import { Product } from '../../application/domain/entities/product.entity';
 import { Products } from './models';
@@ -19,28 +17,23 @@ export class ProductRepository implements IProductRepository {
 
   async findByProductToken(productToken: string): Promise<Product | null> {
     const product = await this.model.findOne({ where: { productToken } });
-    
+
     return product ? new Product(product) : null;
   }
 
-  async findAllPaginated(options: PaginationOptions): Promise<PaginatedResult<Product>> {
-    const { page, limit } = options;
-    const offset = (page - 1) * limit;
-
+  async findWithLimitOffset(
+    limit: number,
+    offset: number,
+  ): Promise<{ data: Product[]; total: number }> {
     const { rows, count } = await this.model.findAndCountAll({
       limit,
       offset,
       order: [['id', 'ASC']],
     });
 
-    const totalPages = Math.ceil(count / limit) || 1;
-
     return {
       data: rows.map((product) => new Product(product)),
       total: count,
-      page,
-      limit,
-      totalPages,
     };
   }
 

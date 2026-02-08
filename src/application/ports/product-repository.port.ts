@@ -10,11 +10,6 @@ export interface CreateProductInput extends ProductData {
   productToken: string;
 }
 
-export interface PaginationOptions {
-  page: number;
-  limit: number;
-}
-
 export interface PaginatedResult<T> {
   data: T[];
   total: number;
@@ -26,7 +21,7 @@ export interface PaginatedResult<T> {
 export interface IProductRepository {
   create(product: CreateProductInput): Promise<Product>;
   findByProductToken(productToken: string): Promise<Product | null>;
-  findAllPaginated(options: PaginationOptions): Promise<PaginatedResult<Product>>;
+  findWithLimitOffset(limit: number, offset: number): Promise<{ data: Product[]; total: number }>;
   update(id: string, product: Partial<ProductData>): Promise<Product | null>;
   delete(id: string): Promise<boolean>;
 }

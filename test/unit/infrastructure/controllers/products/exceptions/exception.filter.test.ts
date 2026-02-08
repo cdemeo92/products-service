@@ -1,4 +1,10 @@
-import { HttpStatus, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
+import {
+  HttpStatus,
+  HttpException,
+  NotFoundException,
+  BadRequestException,
+  Logger,
+} from '@nestjs/common';
 import { ArgumentsHost } from '@nestjs/common/interfaces/features/arguments-host.interface';
 import { ProductsExceptionFilter } from '../../../../../../src/infrastructure/controllers/products/exceptions/exception.filter';
 import {
@@ -60,6 +66,15 @@ describe('ProductsExceptionFilter', () => {
 
       expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.BAD_REQUEST);
       expect(mockResponse.json).toHaveBeenCalledWith({ error: 'first' });
+    });
+
+    it('should use exception.message when HttpException getResponse is not object with message', () => {
+      const exception = new HttpException('Plain string response', HttpStatus.BAD_REQUEST);
+
+      filter.catch(exception, mockHost);
+
+      expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.BAD_REQUEST);
+      expect(mockResponse.json).toHaveBeenCalledWith({ error: 'Plain string response' });
     });
 
     it('should set status 500 and fixed message when exception is Error', () => {

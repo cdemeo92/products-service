@@ -13,9 +13,11 @@ export class CreateProductUseCase {
 
   async execute(input: CreateProductInput) {
     const existing = await this.productRepository.findByProductToken(input.productToken);
+
     if (existing) {
       throw new DuplicateProductTokenException(input.productToken);
     }
+
     return this.productRepository.create(input);
   }
 }

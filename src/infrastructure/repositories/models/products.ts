@@ -1,4 +1,4 @@
-import { Model, Table, Column, DataType, Index, Sequelize, ForeignKey } from 'sequelize-typescript';
+import { Model, Table, Column, DataType, Index } from 'sequelize-typescript';
 
 export interface ProductsAttributes {
   id?: string;

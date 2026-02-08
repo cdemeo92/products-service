@@ -77,10 +77,7 @@ describe('ProductsController', () => {
 
       const result = await controller.findAll(query);
 
-      expect(productsApplication.findAll).toHaveBeenCalledWith({
-        page: 1,
-        limit: 10,
-      });
+      expect(productsApplication.findAll).toHaveBeenCalledWith(1, 10);
       expect(productsApplication.findAll).toHaveBeenCalledTimes(1);
       expect(result).toBeInstanceOf(PaginatedProductsDto);
       expect(result.products).toHaveLength(1);
@@ -105,7 +102,7 @@ describe('ProductsController', () => {
 
       const result = await controller.findAll(query);
 
-      expect(productsApplication.findAll).toHaveBeenCalledWith({ page: 2, limit: 25 });
+      expect(productsApplication.findAll).toHaveBeenCalledWith(2, 25);
       expect(productsApplication.findAll).toHaveBeenCalledTimes(1);
       expect(result).toBeInstanceOf(PaginatedProductsDto);
       expect(result.products).toHaveLength(2);

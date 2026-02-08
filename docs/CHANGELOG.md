@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/cdemeo92/products-service/compare/v1.1.0...v1.2.0) (2026-02-08)
+
+
+### Features
+
+* implemented get, update and delete product use case ([c372586](https://github.com/cdemeo92/products-service/commit/c3725860ae120bfee3406002fe1e5362a0af465e))
+
 # [1.1.0](https://github.com/cdemeo92/products-service/compare/v1.0.0...v1.1.0) (2026-02-08)
 
 

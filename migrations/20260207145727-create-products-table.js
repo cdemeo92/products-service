@@ -25,6 +25,8 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
       }
+    }, {
+      timestamps: false,
     });
   },
 

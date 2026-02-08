@@ -10,7 +10,7 @@ export interface ProductsAttributes {
 
 @Table({
   tableName: 'products',
-  timestamps: true,
+  timestamps: false,
 })
 export class Products
   extends Model<ProductsAttributes, ProductsAttributes>

@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { SequelizeModule, getModelToken } from '@nestjs/sequelize';
 import { ProductsApplication } from '../../../application/products.applicaton';
 import { ProductsController } from './products.controller';
 import { Products } from 'src/infrastructure/repositories/models';
@@ -9,12 +10,14 @@ import { UpdateProductStockUseCase } from 'src/application/use-cases/update-prod
 import { DeleteProductUseCase } from 'src/application/use-cases/delete-product.use-case';
 
 @Module({
+  imports: [SequelizeModule.forFeature([Products])],
   controllers: [ProductsController],
   providers: [
     {
       provide: ProductsApplication,
-      useFactory: () => {
-        const productRepository = new ProductRepository(Products);
+      inject: [getModelToken(Products)],
+      useFactory: (model: typeof Products) => {
+        const productRepository = new ProductRepository(model);
         return new ProductsApplication(
           new CreateProductUseCase(productRepository),
           new GetProductsUseCase(productRepository),

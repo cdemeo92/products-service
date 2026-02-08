@@ -1,3 +1,5 @@
+## [1.3.1](https://github.com/cdemeo92/products-service/compare/v1.3.0...v1.3.1) (2026-02-08)
+
 # [1.3.0](https://github.com/cdemeo92/products-service/compare/v1.2.0...v1.3.0) (2026-02-08)
 
 

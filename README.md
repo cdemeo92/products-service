@@ -1,8 +1,8 @@
 # Products Service
 
-[semantic-release: 📦🚀](https://github.com/semantic-release/semantic-release)
-[Conventional Commits](https://conventionalcommits.org)
-[products-service:latest](https://github.com/cdemeo92/products-service/pkgs/container/products-service)
+[![semantic-release: 📦🚀](https://img.shields.io/badge/semantic--release-📦🚀-e10079?logo=semantic-release)](https://github.com/semantic-release/semantic-release)
+[![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-blue.svg)](https://conventionalcommits.org)
+[![products-service:latest](https://img.shields.io/badge/products--service-blue?logo=docker)](https://github.com/cdemeo92/products-service/pkgs/container/products-service)
 
 NestJS backend microservice for an e-commerce platform to manage products in the database.
 

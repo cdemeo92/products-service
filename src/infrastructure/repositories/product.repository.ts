@@ -15,6 +15,12 @@ export class ProductRepository implements IProductRepository {
     return new Product(createdProduct);
   }
 
+  async findById(id: string): Promise<Product | null> {
+    const product = await this.model.findByPk(id);
+
+    return product ? new Product(product) : null;
+  }
+
   async findByProductToken(productToken: string): Promise<Product | null> {
     const product = await this.model.findOne({ where: { productToken } });
 
@@ -37,21 +43,10 @@ export class ProductRepository implements IProductRepository {
     };
   }
 
-  async update(id: string, product: Partial<ProductData>): Promise<Product | null> {
-    const [affected] = await this.model.update(
-      {
-        ...(product.stock !== undefined ? { stock: product.stock } : {}),
-        ...(product.name !== undefined ? { name: product.name } : {}),
-        ...(product.price !== undefined ? { price: product.price } : {}),
-      },
-      { where: { id } },
-    );
-
-    if (affected === 0) return null;
-
-    const updatedProduct = await this.model.findByPk(id);
-
-    return updatedProduct ? new Product(updatedProduct) : null;
+  async update(id: string, payload: Partial<ProductData>): Promise<boolean> {
+    const [affected] = await this.model.update(payload, { where: { id } });
+    
+    return affected > 0;
   }
 
   async delete(id: string): Promise<boolean> {

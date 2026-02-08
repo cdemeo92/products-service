@@ -28,27 +28,29 @@ describe('UpdateProductStockUseCase', () => {
   });
 
   describe('execute', () => {
-    it('should delegate to repository update and return the updated product', async () => {
-      productRepository.update.mockResolvedValue(updatedProduct);
+    it('should build payload, call update then findById and return the product', async () => {
+      productRepository.update.mockResolvedValue(true);
+      productRepository.findById.mockResolvedValue(updatedProduct);
 
       const result = await useCase.execute(productId, partialUpdate);
 
-      expect(productRepository.update).toHaveBeenCalledWith(productId, partialUpdate);
+      expect(productRepository.update).toHaveBeenCalledWith(productId, { stock: 20 });
       expect(productRepository.update).toHaveBeenCalledTimes(1);
+      expect(productRepository.findById).toHaveBeenCalledWith(productId);
       expect(result).toBeInstanceOf(Product);
       expect(result).toBe(updatedProduct);
-      expect(result.id).toBe(productId);
       expect(result.stock).toBe(20);
     });
 
-    it('should throw ProductNotFoundException when product does not exist', async () => {
-      productRepository.update.mockResolvedValue(null);
+    it('should throw ProductNotFoundException when update returns false', async () => {
+      productRepository.update.mockResolvedValue(false);
 
       const promise = useCase.execute(productId, partialUpdate);
       await expect(promise).rejects.toThrow(ProductNotFoundException);
       await expect(promise).rejects.toThrow(`Product not found: ${productId}`);
 
-      expect(productRepository.update).toHaveBeenCalledWith(productId, partialUpdate);
+      expect(productRepository.update).toHaveBeenCalledWith(productId, { stock: 20 });
+      expect(productRepository.findById).not.toHaveBeenCalled();
     });
 
     it('should propagate error when update fails', async () => {
@@ -56,7 +58,7 @@ describe('UpdateProductStockUseCase', () => {
 
       await expect(useCase.execute(productId, partialUpdate)).rejects.toThrow('Database error');
 
-      expect(productRepository.update).toHaveBeenCalledWith(productId, partialUpdate);
+      expect(productRepository.update).toHaveBeenCalledWith(productId, { stock: 20 });
     });
 
     it('should support partial update of name and price', async () => {
@@ -68,13 +70,47 @@ describe('UpdateProductStockUseCase', () => {
         price: 9.99,
         stock: 5,
       });
-      productRepository.update.mockResolvedValue(productAfterUpdate);
+      productRepository.update.mockResolvedValue(true);
+      productRepository.findById.mockResolvedValue(productAfterUpdate);
 
       const result = await useCase.execute(productId, namePriceUpdate);
 
-      expect(productRepository.update).toHaveBeenCalledWith(productId, namePriceUpdate);
+      expect(productRepository.update).toHaveBeenCalledWith(productId, {
+        name: 'New Name',
+        price: 9.99,
+      });
+      expect(productRepository.findById).toHaveBeenCalledWith(productId);
       expect(result.name).toBe('New Name');
       expect(result.price).toBe(9.99);
+    });
+
+    it('should throw ProductNotFoundException when update succeeds but findById returns null', async () => {
+      productRepository.update.mockResolvedValue(true);
+      productRepository.findById.mockResolvedValue(null);
+
+      await expect(useCase.execute(productId, partialUpdate)).rejects.toThrow(
+        ProductNotFoundException,
+      );
+      expect(productRepository.findById).toHaveBeenCalledWith(productId);
+    });
+
+    it('should return existing product via findById when no fields to update (empty payload)', async () => {
+      productRepository.findById.mockResolvedValue(updatedProduct);
+
+      const result = await useCase.execute(productId, {});
+
+      expect(productRepository.findById).toHaveBeenCalledWith(productId);
+      expect(productRepository.findById).toHaveBeenCalledTimes(1);
+      expect(productRepository.update).not.toHaveBeenCalled();
+      expect(result).toBe(updatedProduct);
+    });
+
+    it('should throw ProductNotFoundException when no fields to update and product does not exist', async () => {
+      productRepository.findById.mockResolvedValue(null);
+
+      await expect(useCase.execute(productId, {})).rejects.toThrow(ProductNotFoundException);
+      expect(productRepository.findById).toHaveBeenCalledWith(productId);
+      expect(productRepository.update).not.toHaveBeenCalled();
     });
   });
 });

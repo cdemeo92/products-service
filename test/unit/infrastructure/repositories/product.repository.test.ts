@@ -58,6 +58,34 @@ describe('ProductRepository', () => {
     });
   });
 
+  describe('findById', () => {
+    it('should return a Product when a product with the given id exists', async () => {
+      const row = mockRow({ id: 'id-123' });
+      model.findByPk.mockResolvedValue(row);
+
+      const result = await repository.findById('id-123');
+
+      expect(model.findByPk).toHaveBeenCalledWith('id-123');
+      expect(result).toBeInstanceOf(Product);
+      expect(result?.id).toBe('id-123');
+    });
+
+    it('should return null when no product exists with the given id', async () => {
+      model.findByPk.mockResolvedValue(null);
+
+      const result = await repository.findById('non-existent');
+
+      expect(model.findByPk).toHaveBeenCalledWith('non-existent');
+      expect(result).toBeNull();
+    });
+
+    it('should throw an error when the findByPk operation fails', async () => {
+      model.findByPk.mockRejectedValue(new Error('Find by pk failed'));
+
+      await expect(repository.findById('id-123')).rejects.toThrow('Find by pk failed');
+    });
+  });
+
   describe('findByProductToken', () => {
     it('should return a Product when a product with the given productToken exists', async () => {
       const row = mockRow({ productToken: 'TOKEN-123' });
@@ -140,43 +168,26 @@ describe('ProductRepository', () => {
   });
 
   describe('update', () => {
-    it('should return the updated product when the update operation succeeds', async () => {
-      const row = mockRow({ stock: 20 });
+    it('should return true when the update affects at least one row', async () => {
       model.update.mockResolvedValue([1]);
-      model.findByPk.mockResolvedValue(row);
 
       const result = await repository.update('1', { stock: 20 });
 
       expect(model.update).toHaveBeenCalledWith({ stock: 20 }, { where: { id: '1' } });
-      expect(model.findByPk).toHaveBeenCalledWith('1');
-      expect(result).toBeInstanceOf(Product);
-      expect(result?.stock).toBe(20);
+      expect(result).toBe(true);
     });
 
-    it('should return null when does not exist a product with the given id', async () => {
+    it('should return false when no row is affected by the update', async () => {
       model.update.mockResolvedValue([0]);
 
       const result = await repository.update('1', { stock: 20 });
 
       expect(model.update).toHaveBeenCalledWith({ stock: 20 }, { where: { id: '1' } });
-      expect(model.findByPk).not.toHaveBeenCalled();
-      expect(result).toBeNull();
+      expect(result).toBe(false);
     });
 
-    it('should return null when update succeeds but findByPk returns null', async () => {
+    it('should pass payload and id to model.update', async () => {
       model.update.mockResolvedValue([1]);
-      model.findByPk.mockResolvedValue(null);
-
-      const result = await repository.update('1', { stock: 20 });
-
-      expect(model.findByPk).toHaveBeenCalledWith('1');
-      expect(result).toBeNull();
-    });
-
-    it('should pass only defined fields to the update operation', async () => {
-      const row = mockRow({ name: 'New', price: '9.99' });
-      model.update.mockResolvedValue([1]);
-      model.findByPk.mockResolvedValue(row);
 
       await repository.update('1', { name: 'New', price: 9.99 });
 
@@ -184,7 +195,6 @@ describe('ProductRepository', () => {
         { name: 'New', price: 9.99 },
         { where: { id: '1' } },
       );
-      expect(model.findByPk).toHaveBeenCalledWith('1');
     });
 
     it('should throw an error when the update operation fails', async () => {

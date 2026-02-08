@@ -7,6 +7,7 @@
   "variable": [
     { "key": "baseUrl", "value": "http://localhost:3000" },
     { "key": "productId", "value": "" },
+    { "key": "productToken", "value": "" },
     { "key": "nonExistentId", "value": "00000000-0000-0000-0000-000000000001", "description": "UUID that does not exist; use in 404 tests (Update/Delete)." }
   ],
   "item": [
@@ -17,14 +18,24 @@
           "name": "Create product",
           "event": [
             {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.collectionVariables.set('productToken', 'SKU-' + Date.now());"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
               "listen": "test",
               "script": {
                 "exec": [
                   "pm.test('Status is 201', function () { pm.response.to.have.status(201); });",
                   "pm.test('Body has id and productToken', function () {",
                   "  const j = pm.response.json();",
+                  "  const expectedToken = pm.collectionVariables.get('productToken');",
                   "  pm.expect(j).to.have.property('id');",
-                  "  pm.expect(j).to.have.property('productToken', 'SKU-001');",
+                  "  pm.expect(j).to.have.property('productToken', expectedToken);",
                   "  if (j.id) pm.collectionVariables.set('productId', j.id);",
                   "});"
                 ],
@@ -37,7 +48,7 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"productToken\": \"SKU-001\",\n  \"name\": \"Product One\",\n  \"price\": \"29.99\",\n  \"stock\": 100\n}"
+              "raw": "{\n  \"productToken\": \"{{productToken}}\",\n  \"name\": \"Product One\",\n  \"price\": \"29.99\",\n  \"stock\": 100\n}"
             },
             "url": "{{baseUrl}}/products",
             "description": "201 Created — new product. Tests save returned `id` into collection variable `productId` for Update/Delete."
@@ -361,17 +372,6 @@
             "method": "DELETE",
             "url": "{{baseUrl}}/products/not-a-number",
             "description": "404 Not Found — id not found (API does not validate UUID format on path)."
-          }
-        },
-        {
-          "name": "200 - Update empty body (no-op)",
-          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status is 200', function () { pm.response.to.have.status(200); });"], "type": "text/javascript" } }],
-          "request": {
-            "method": "PATCH",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": { "mode": "raw", "raw": "{}" },
-            "url": "{{baseUrl}}/products/{{productId}}",
-            "description": "200 OK — empty body is valid (no-op; no fields to update)."
           }
         },
         {

@@ -25,6 +25,7 @@ To make this service robust and production-ready, the following would be added o
 - **Security** – Authentication and authorization (e.g. JWT or API keys) and HTTPS only.
 - **Search filters** – Extend the product listing with query parameters (e.g. by name, price range, stock) to filter search results.
 - **Get single product** – Add an API endpoint to retrieve a single product by id or by productToken.
+- **Currency and multi-currency support** – Associate a currency with prices and support listing/display in different currencies (conversion or stored multi-currency values).
 
 ## Project structure
 
@@ -92,8 +93,15 @@ For the full list of supported variables, see [Environment variables](#environme
 
 **API Documentation**: Once the service is running, interactive API documentation is available at `http://localhost:3000/docs` (Swagger UI). You can explore endpoints, view request/response schemas, and test the API directly from the browser.
 
-Use an HTTP client such as [Postman](https://www.postman.com/) or `curl` to call the API. A **Postman collection** with all scenarios is available in [`postman/Products-Service.postman_collection.json`](./postman/Products-Service.postman_collection.json). Import it into Postman and set the `baseUrl` variable to `http://localhost:3000` (default) if needed. 
-With the service running (e.g. on `http://localhost:3000`), you can try the following cases.
+Use an HTTP client such as [Postman](https://www.postman.com/) or `curl` to call the API. A **Postman collection** with all scenarios is available in [`postman/Products-Service.postman_collection.json`](./postman/Products-Service.postman_collection.json). Import it into Postman and set the `baseUrl` variable to `http://localhost:3000` (default) if needed.
+
+**Running the Postman collection from the CLI**  
+After starting the app, you can run the same collection as automated tests.
+
+1. `npm i` — install dependencies  
+4. Configure `.env` for the DB (copy `.env.dev` to `.env` and adjust if needed; see [Environment variables](#environment-variables))  
+3. `docker compose up -d db` — start the database  
+4. In another terminal: `npm run test:postman`
 
 ## Getting started
 
@@ -171,6 +179,7 @@ npm run test:all
 | `npm run test:ci` | Unit tests with coverage and JUnit output (CI) |
 | `npm run test:integ` | Run integration tests |
 | `npm run test:e2e` | Run E2E tests |
+| `npm run test:postman` | Run Postman collection with Newman (**requires the app to be running**) |
 | `npm run test:all` | Run unit, integ, and e2e in sequence |
 | `npm run migrate` | Run Sequelize migrations |
 | `npm run migrate:undo` | Rollback the last executed migration |

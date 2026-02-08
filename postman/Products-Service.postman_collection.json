@@ -6,7 +6,8 @@
   },
   "variable": [
     { "key": "baseUrl", "value": "http://localhost:3000" },
-    { "key": "productId", "value": "1", "description": "Set from Create product response (id); use for Update/Delete. For 404 use non-existent id (e.g. 99999)." }
+    { "key": "productId", "value": "" },
+    { "key": "nonExistentId", "value": "00000000-0000-0000-0000-000000000001", "description": "UUID that does not exist; use in 404 tests (Update/Delete)." }
   ],
   "item": [
     {
@@ -14,6 +15,23 @@
       "item": [
         {
           "name": "Create product",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 201', function () { pm.response.to.have.status(201); });",
+                  "pm.test('Body has id and productToken', function () {",
+                  "  const j = pm.response.json();",
+                  "  pm.expect(j).to.have.property('id');",
+                  "  pm.expect(j).to.have.property('productToken', 'SKU-001');",
+                  "  if (j.id) pm.collectionVariables.set('productId', j.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -22,28 +40,30 @@
               "raw": "{\n  \"productToken\": \"SKU-001\",\n  \"name\": \"Product One\",\n  \"price\": \"29.99\",\n  \"stock\": 100\n}"
             },
             "url": "{{baseUrl}}/products",
-            "description": "201 Created — new product. Copy returned `id` into collection variable `productId` for Update/Delete."
+            "description": "201 Created — new product. Tests save returned `id` into collection variable `productId` for Update/Delete."
           }
         },
         {
           "name": "List products (default pagination)",
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status is 200', function () { pm.response.to.have.status(200); });", "pm.test('Body has products, page, limit, total, totalPages', function () { const j = pm.response.json(); pm.expect(j).to.have.keys('products','page','limit','total','totalPages'); pm.expect(j.products).to.be.an('array'); });"], "type": "text/javascript" } }],
           "request": {
             "method": "GET",
             "url": "{{baseUrl}}/products",
-            "description": "200 OK — response: { products, page, size, total } with default page/size."
+            "description": "200 OK — response: { products, page, limit, total, totalPages } with default page=1, limit=10."
           }
         },
         {
-          "name": "List products (page and size)",
+          "name": "List products (page and limit)",
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status is 200', function () { pm.response.to.have.status(200); });", "pm.test('Body has pagination shape', function () { const j = pm.response.json(); pm.expect(j).to.have.property('page', 1); pm.expect(j).to.have.property('limit', 10); });"], "type": "text/javascript" } }],
           "request": {
             "method": "GET",
             "url": {
-              "raw": "{{baseUrl}}/products?page=1&size=10",
+              "raw": "{{baseUrl}}/products?page=1&limit=10",
               "host": ["{{baseUrl}}"],
               "path": ["products"],
               "query": [
                 { "key": "page", "value": "1" },
-                { "key": "size", "value": "10" }
+                { "key": "limit", "value": "10" }
               ]
             },
             "description": "200 OK — paginated list."
@@ -51,14 +71,16 @@
         },
         {
           "name": "List products (empty result)",
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status is 200', function () { pm.response.to.have.status(200); });", "pm.test('Body has products array', function () { pm.expect(pm.response.json().products).to.be.an('array'); });"], "type": "text/javascript" } }],
           "request": {
             "method": "GET",
-            "url": "{{baseUrl}}/products?page=99&size=10",
+            "url": "{{baseUrl}}/products?page=99&limit=10",
             "description": "200 OK — empty products array when page beyond data (or when DB has no products); total may be 0."
           }
         },
         {
           "name": "Update product (single field - stock)",
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status is 200', function () { pm.response.to.have.status(200); });", "pm.test('Body has updated stock', function () { pm.expect(pm.response.json()).to.have.property('stock', 50); });"], "type": "text/javascript" } }],
           "request": {
             "method": "PATCH",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -69,6 +91,7 @@
         },
         {
           "name": "Update product (multiple fields)",
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status is 200', function () { pm.response.to.have.status(200); });", "pm.test('Body has updated fields', function () { const j = pm.response.json(); pm.expect(j.name).to.eql('Product One Updated'); pm.expect(j.stock).to.eql(25); });"], "type": "text/javascript" } }],
           "request": {
             "method": "PATCH",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -82,10 +105,11 @@
         },
         {
           "name": "Delete product",
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status is 204', function () { pm.response.to.have.status(204); });"], "type": "text/javascript" } }],
           "request": {
             "method": "DELETE",
             "url": "{{baseUrl}}/products/{{productId}}",
-            "description": "204 No Content (or 200) — product removed. Uses productId."
+            "description": "204 No Content — product removed. Uses productId."
           }
         }
       ]
@@ -95,6 +119,7 @@
       "item": [
         {
           "name": "409 - Duplicate productToken",
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status is 409', function () { pm.response.to.have.status(409); });", "pm.test('Body has error', function () { pm.expect(pm.response.json()).to.have.property('error'); });"], "type": "text/javascript" } }],
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -108,6 +133,7 @@
         },
         {
           "name": "400 - Create missing productToken",
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status is 400', function () { pm.response.to.have.status(400); });", "pm.test('Body has error', function () { pm.expect(pm.response.json()).to.have.property('error'); });"], "type": "text/javascript" } }],
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -121,6 +147,7 @@
         },
         {
           "name": "400 - Create missing name",
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status is 400', function () { pm.response.to.have.status(400); });", "pm.test('Body has error', function () { pm.expect(pm.response.json()).to.have.property('error'); });"], "type": "text/javascript" } }],
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -134,6 +161,7 @@
         },
         {
           "name": "400 - Create missing price",
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status is 400', function () { pm.response.to.have.status(400); });", "pm.test('Body has error', function () { pm.expect(pm.response.json()).to.have.property('error'); });"], "type": "text/javascript" } }],
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -147,6 +175,7 @@
         },
         {
           "name": "400 - Create missing stock",
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status is 400', function () { pm.response.to.have.status(400); });", "pm.test('Body has error', function () { pm.expect(pm.response.json()).to.have.property('error'); });"], "type": "text/javascript" } }],
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -160,6 +189,7 @@
         },
         {
           "name": "400 - Create empty body",
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status is 400', function () { pm.response.to.have.status(400); });", "pm.test('Body has error', function () { pm.expect(pm.response.json()).to.have.property('error'); });"], "type": "text/javascript" } }],
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -170,6 +200,7 @@
         },
         {
           "name": "400 - Create empty productToken",
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status is 400', function () { pm.response.to.have.status(400); });", "pm.test('Body has error', function () { pm.expect(pm.response.json()).to.have.property('error'); });"], "type": "text/javascript" } }],
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -183,6 +214,7 @@
         },
         {
           "name": "400 - Create empty name",
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status is 400', function () { pm.response.to.have.status(400); });", "pm.test('Body has error', function () { pm.expect(pm.response.json()).to.have.property('error'); });"], "type": "text/javascript" } }],
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -196,6 +228,7 @@
         },
         {
           "name": "400 - Create invalid price (negative)",
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status is 400', function () { pm.response.to.have.status(400); });", "pm.test('Body has error', function () { pm.expect(pm.response.json()).to.have.property('error'); });"], "type": "text/javascript" } }],
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -209,6 +242,7 @@
         },
         {
           "name": "400 - Create invalid stock (negative)",
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status is 400', function () { pm.response.to.have.status(400); });", "pm.test('Body has error', function () { pm.expect(pm.response.json()).to.have.property('error'); });"], "type": "text/javascript" } }],
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -222,6 +256,7 @@
         },
         {
           "name": "400 - Create invalid price type (not a number)",
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status is 400', function () { pm.response.to.have.status(400); });", "pm.test('Body has error', function () { pm.expect(pm.response.json()).to.have.property('error'); });"], "type": "text/javascript" } }],
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -235,6 +270,7 @@
         },
         {
           "name": "400 - Create invalid stock type (not an integer)",
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status is 400', function () { pm.response.to.have.status(400); });", "pm.test('Body has error', function () { pm.expect(pm.response.json()).to.have.property('error'); });"], "type": "text/javascript" } }],
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -248,20 +284,22 @@
         },
         {
           "name": "404 - Update non-existent product",
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status is 404', function () { pm.response.to.have.status(404); });", "pm.test('Body has error', function () { pm.expect(pm.response.json()).to.have.property('error'); });"], "type": "text/javascript" } }],
           "request": {
             "method": "PATCH",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": { "mode": "raw", "raw": "{\n  \"stock\": 1\n}" },
-            "url": "{{baseUrl}}/products/99999",
-            "description": "404 Not Found — no product with id 99999."
+            "url": "{{baseUrl}}/products/{{nonExistentId}}",
+            "description": "404 Not Found — no product with given id."
           }
         },
         {
           "name": "404 - Delete non-existent product",
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status is 404', function () { pm.response.to.have.status(404); });", "pm.test('Body has error', function () { pm.expect(pm.response.json()).to.have.property('error'); });"], "type": "text/javascript" } }],
           "request": {
             "method": "DELETE",
-            "url": "{{baseUrl}}/products/99999",
-            "description": "404 Not Found — no product with id 99999."
+            "url": "{{baseUrl}}/products/{{nonExistentId}}",
+            "description": "404 Not Found — no product with given id."
           }
         }
       ]
@@ -271,58 +309,74 @@
       "item": [
         {
           "name": "400 - List invalid page (zero or negative)",
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status is 400', function () { pm.response.to.have.status(400); });", "pm.test('Body has error', function () { pm.expect(pm.response.json()).to.have.property('error'); });"], "type": "text/javascript" } }],
           "request": {
             "method": "GET",
-            "url": { "raw": "{{baseUrl}}/products?page=0&size=10", "host": ["{{baseUrl}}"], "path": ["products"], "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "10" }] },
-            "description": "400 Bad Request — page should be >= 1 (if validated)."
+            "url": { "raw": "{{baseUrl}}/products?page=0&limit=10", "host": ["{{baseUrl}}"], "path": ["products"], "query": [{ "key": "page", "value": "0" }, { "key": "limit", "value": "10" }] },
+            "description": "400 Bad Request — page should be >= 1 (validated)."
           }
         },
         {
-          "name": "400 - List invalid size (zero or negative)",
+          "name": "400 - List invalid limit (zero or negative)",
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status is 400', function () { pm.response.to.have.status(400); });", "pm.test('Body has error', function () { pm.expect(pm.response.json()).to.have.property('error'); });"], "type": "text/javascript" } }],
           "request": {
             "method": "GET",
-            "url": { "raw": "{{baseUrl}}/products?page=1&size=0", "host": ["{{baseUrl}}"], "path": ["products"], "query": [{ "key": "page", "value": "1" }, { "key": "size", "value": "0" }] },
-            "description": "400 Bad Request — size should be >= 1 (if validated)."
+            "url": { "raw": "{{baseUrl}}/products?page=1&limit=0", "host": ["{{baseUrl}}"], "path": ["products"], "query": [{ "key": "page", "value": "1" }, { "key": "limit", "value": "0" }] },
+            "description": "400 Bad Request — limit should be >= 1 (validated)."
           }
         },
         {
-          "name": "400 - List invalid query (non-numeric page/size)",
+          "name": "400 - List invalid query (non-numeric page/limit)",
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status is 400', function () { pm.response.to.have.status(400); });", "pm.test('Body has error', function () { pm.expect(pm.response.json()).to.have.property('error'); });"], "type": "text/javascript" } }],
           "request": {
             "method": "GET",
-            "url": { "raw": "{{baseUrl}}/products?page=abc&size=xyz", "host": ["{{baseUrl}}"], "path": ["products"], "query": [{ "key": "page", "value": "abc" }, { "key": "size", "value": "xyz" }] },
-            "description": "400 Bad Request — page and size must be valid numbers (if validated)."
+            "url": { "raw": "{{baseUrl}}/products?page=abc&limit=xyz", "host": ["{{baseUrl}}"], "path": ["products"], "query": [{ "key": "page", "value": "abc" }, { "key": "limit", "value": "xyz" }] },
+            "description": "400 Bad Request — page and limit must be valid numbers (validated)."
           }
         },
         {
-          "name": "400 - Update invalid id in path",
+          "name": "400 - List limit > 100",
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status is 400', function () { pm.response.to.have.status(400); });", "pm.test('Body has error', function () { pm.expect(pm.response.json()).to.have.property('error'); });"], "type": "text/javascript" } }],
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/products?page=1&limit=101", "host": ["{{baseUrl}}"], "path": ["products"], "query": [{ "key": "page", "value": "1" }, { "key": "limit", "value": "101" }] },
+            "description": "400 Bad Request — limit max is 100 (validated)."
+          }
+        },
+        {
+          "name": "404 - Update invalid or non-existent id in path",
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status is 404', function () { pm.response.to.have.status(404); });", "pm.test('Body has error', function () { pm.expect(pm.response.json()).to.have.property('error'); });"], "type": "text/javascript" } }],
           "request": {
             "method": "PATCH",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": { "mode": "raw", "raw": "{\n  \"stock\": 1\n}" },
             "url": "{{baseUrl}}/products/not-a-number",
-            "description": "400 Bad Request — id must be a valid number."
+            "description": "404 Not Found — id not found (API does not validate UUID format on path)."
           }
         },
         {
-          "name": "400 - Delete invalid id in path",
+          "name": "404 - Delete invalid or non-existent id in path",
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status is 404', function () { pm.response.to.have.status(404); });", "pm.test('Body has error', function () { pm.expect(pm.response.json()).to.have.property('error'); });"], "type": "text/javascript" } }],
           "request": {
             "method": "DELETE",
             "url": "{{baseUrl}}/products/not-a-number",
-            "description": "400 Bad Request — id must be a valid number."
+            "description": "404 Not Found — id not found (API does not validate UUID format on path)."
           }
         },
         {
-          "name": "400 - Update empty body",
+          "name": "200 - Update empty body (no-op)",
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status is 200', function () { pm.response.to.have.status(200); });"], "type": "text/javascript" } }],
           "request": {
             "method": "PATCH",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": { "mode": "raw", "raw": "{}" },
             "url": "{{baseUrl}}/products/{{productId}}",
-            "description": "400 Bad Request — at least one field to update required (if validated); otherwise 200 no-op."
+            "description": "200 OK — empty body is valid (no-op; no fields to update)."
           }
         },
         {
           "name": "400 - Malformed JSON body (Create)",
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status is 400', function () { pm.response.to.have.status(400); });"], "type": "text/javascript" } }],
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -333,6 +387,7 @@
         },
         {
           "name": "404 - Delete already deleted (double delete)",
+          "event": [{ "listen": "test", "script": { "exec": ["pm.test('Status is 404', function () { pm.response.to.have.status(404); });", "pm.test('Body has error', function () { pm.expect(pm.response.json()).to.have.property('error'); });"], "type": "text/javascript" } }],
           "request": {
             "method": "DELETE",
             "url": "{{baseUrl}}/products/{{productId}}",

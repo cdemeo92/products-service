@@ -8,6 +8,8 @@ import {
   Delete,
   Query,
   UseFilters,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ProductsApplication } from '../../../application/products.applicaton';
@@ -82,6 +84,7 @@ export class ProductsController {
   }
 
   @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({
     summary: 'Delete a product',
     description: 'Deletes the product. Returns 204 No Content on success.',

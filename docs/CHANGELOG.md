@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/cdemeo92/products-service/compare/v1.0.0...v1.1.0) (2026-02-08)
+
+
+### Features
+
+* implement CreateProduct use case and add findByProductToken method to product repository ([020da87](https://github.com/cdemeo92/products-service/commit/020da87d4e075dda4bb44f03996355c7bd66e96d))
+
 # 1.0.0 (2026-02-07)
 
 

@@ -119,7 +119,7 @@ After starting the app, you can run the same collection as automated tests.
 1. `npm i` — install dependencies  
 4. Configure `.env` for the DB (copy `.env.dev` to `.env` and adjust if needed; see [Environment variables](#environment-variables))  
 3. `docker compose up -d` — start the application  
-4. In another terminal: `npm run test:postman`
+4. `npm run test:postman` - start postman tests
 
 ## Getting started
 

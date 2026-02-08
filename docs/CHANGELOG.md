@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/cdemeo92/products-service/compare/v1.2.0...v1.3.0) (2026-02-08)
+
+
+### Features
+
+* enhance product API with improved test cases and validation checks ([c93743e](https://github.com/cdemeo92/products-service/commit/c93743ee7f44f6ffe2236db524dd57a78f9e850e))
+
 # [1.2.0](https://github.com/cdemeo92/products-service/compare/v1.1.0...v1.2.0) (2026-02-08)
 
 

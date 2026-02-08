@@ -79,16 +79,6 @@ jobs:
     name: Integration tests
     needs: [unit, audit]
     runs-on: ubuntu-latest
-    services:
-      mysql:
-        image: mysql:8
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping -h localhost -u root -proot"
-          --health-interval=5s
-          --health-timeout=5s
-          --health-retries=10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -107,16 +97,6 @@ jobs:
     name: E2E tests
     needs: integ
     runs-on: ubuntu-latest
-    services:
-      mysql:
-        image: mysql:8
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping -h localhost -u root -proot"
-          --health-interval=5s
-          --health-timeout=5s
-          --health-retries=10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

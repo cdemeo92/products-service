@@ -1,3 +1,10 @@
+## [1.3.2](https://github.com/cdemeo92/products-service/compare/v1.3.1...v1.3.2) (2026-02-09)
+
+
+### Bug Fixes
+
+* update PaginationQueryDto to include type definitions for API properties ([bc9de40](https://github.com/cdemeo92/products-service/commit/bc9de40884f747501d07bb6c1f33327d4073746a))
+
 ## [1.3.1](https://github.com/cdemeo92/products-service/compare/v1.3.0...v1.3.1) (2026-02-08)
 
 # [1.3.0](https://github.com/cdemeo92/products-service/compare/v1.2.0...v1.3.0) (2026-02-08)

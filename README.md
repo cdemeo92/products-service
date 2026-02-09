@@ -26,12 +26,12 @@ NestJS backend microservice for an e-commerce platform to manage products in the
 
 ## Requirements & scope
 
-**Objective:** Build a NestJS microservice that manages products for an e-commerce platform, using Sequelize as the ORM and MySQL as the database. The service exposes CRUD over products with validation, error handling, and pagination for listing.
+This project is a NestJS microservice for an e-commerce platform that manages products in the database. It uses Sequelize as the ORM and MySQL as the database. The goal is to expose full CRUD over products with validation, error handling, and pagination for listing.
 
 ## Assumptions
 
 - The project is runnable with a single command (e.g. `docker compose up`); that setup starts MySQL and the app and provisions the database and schema.
-- The application can be run as a single container (or process) by configuring env vars to connect to an existing MySQL; the user ensures the database and schema exist (see docs).
+- The application can be run as a single container (or process) by configuring env vars to connect to an existing MySQL.
 - Authentication or authorization are out of scope.
 - `productToken` is the unique business identifier and idempotency key for a product (client-provided in create). Duplicate `productToken` on create → 409 Conflict.
 - Different currencies are not considered; prices are treated as plain numeric values with no currency or multi-currency support.

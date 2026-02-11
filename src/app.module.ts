@@ -19,6 +19,19 @@ import { ProductsModule } from './infrastructure/controllers/products/products.m
         database: process.env.MYSQL_DATABASE,
         autoLoadModels: true,
         synchronize: process.env.NODE_ENV !== 'production',
+        dialectOptions: {
+          connectTimeout: 30000,
+        },
+        retry: {
+          max: 3,
+          timeout: 30000,
+        },
+        pool: {
+          max: 10,
+          min: 0,
+          acquire: 30000,
+          idle: 10000,
+        },
       }),
     }),
     ProductsModule,

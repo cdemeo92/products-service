@@ -45,7 +45,7 @@ export class ProductRepository implements IProductRepository {
 
   async update(id: string, payload: Partial<ProductData>): Promise<boolean> {
     const [affected] = await this.model.update(payload, { where: { id } });
-    
+
     return affected > 0;
   }
 

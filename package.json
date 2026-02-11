@@ -1,6 +1,6 @@
 {
   "name": "products-service",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "author": "Claudio De Meo",
   "license": "ISC",
   "description": "NestJS backend microservice for an e-commerce platform to manage products in the database.",

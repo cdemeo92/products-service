@@ -1,3 +1,10 @@
+## [1.3.3](https://github.com/cdemeo92/products-service/compare/v1.3.2...v1.3.3) (2026-02-11)
+
+
+### Performance Improvements
+
+* enhance database configuration with connection options and retry logic ([6b763ee](https://github.com/cdemeo92/products-service/commit/6b763ee1588402e7cefaf40f134deb1a70520956))
+
 ## [1.3.2](https://github.com/cdemeo92/products-service/compare/v1.3.1...v1.3.2) (2026-02-09)
 
 
